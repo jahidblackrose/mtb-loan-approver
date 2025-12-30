@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { ShieldX } from "lucide-react";
 import Header from "@/components/Header";
 import EmployeeProfile from "@/components/EmployeeProfile";
 import LoanDetails from "@/components/LoanDetails";
@@ -74,6 +76,9 @@ const reviewData = [
 ];
 
 const Index = () => {
+  const [searchParams] = useSearchParams();
+  const applicationId = searchParams.get("ID");
+
   const [decision, setDecision] = useState<{
     status?: "approved" | "rejected" | "pending";
     decidedBy?: string;
@@ -104,6 +109,23 @@ const Index = () => {
       variant: status === "approved" ? "default" : "destructive",
     });
   };
+
+  // Show error page if no ID parameter
+  if (!applicationId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="mx-auto w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center">
+            <ShieldX className="w-10 h-10 text-destructive" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
+          <p className="text-muted-foreground">
+            Invalid or missing application reference. Please use a valid link to access the loan application.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
