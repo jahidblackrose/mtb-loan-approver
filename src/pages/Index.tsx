@@ -61,6 +61,16 @@ const reviewData = [
     status: "pending" as const,
     remarks: "Awaiting final valuation report from approved surveyor.",
   },
+  {
+    title: "CIB Review",
+    department: "Credit Information Bureau",
+    status: "approved" as const,
+    reviewer: "Mr. Nasir Uddin",
+    date: "27 Dec, 2024",
+    remarks: "CIB report verified. No overdue or classified loans found. Credit history is satisfactory.",
+    cibStatus: "Clear",
+    cibDate: "27 Dec, 2024",
+  },
 ];
 
 const Index = () => {
@@ -113,6 +123,9 @@ const Index = () => {
       <main className="relative z-10 container max-w-3xl py-6 pb-28 space-y-6">
         {/* Page Title */}
         <div className="text-center space-y-1 animate-fade-in">
+          <p className="text-sm font-medium text-primary">
+            Mutual Trust Bank PLC
+          </p>
           <h1 className="text-2xl font-bold text-foreground">
             Loan Application Review
           </h1>
