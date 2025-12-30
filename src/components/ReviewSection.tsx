@@ -12,6 +12,8 @@ interface ReviewData {
   date?: string;
   remarks?: string;
   attachments?: { name: string; url: string }[];
+  cibStatus?: string;
+  cibDate?: string;
 }
 
 interface ReviewSectionProps {
@@ -26,7 +28,7 @@ const ReviewSection = ({ reviews }: ReviewSectionProps) => {
           <div className="p-2 rounded-lg bg-gradient-to-br from-secondary to-primary">
             <FileText className="w-5 h-5 text-secondary-foreground" />
           </div>
-          Management Reviews
+          Operational Teams Reviews
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -105,6 +107,23 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
               </div>
             )}
             
+            {(review.cibStatus || review.cibDate) && (
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                {review.cibStatus && (
+                  <div className="p-3 rounded-md bg-card border border-border">
+                    <p className="text-xs text-muted-foreground mb-1">CIB Status</p>
+                    <p className="text-sm font-medium text-foreground">{review.cibStatus}</p>
+                  </div>
+                )}
+                {review.cibDate && (
+                  <div className="p-3 rounded-md bg-card border border-border">
+                    <p className="text-xs text-muted-foreground mb-1">CIB Date</p>
+                    <p className="text-sm font-medium text-foreground">{review.cibDate}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {review.remarks && (
               <div className="p-3 rounded-md bg-card border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Remarks</p>
