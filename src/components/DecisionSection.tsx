@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CheckCircle2, XCircle, Shield, Clock, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,16 @@ const DecisionSection = ({ decision, onDecision, isReadOnly = false }: DecisionS
   const [selectedAction, setSelectedAction] = useState<"approved" | "rejected" | null>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [error, setError] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleActionClick = (action: "approved" | "rejected") => {
     if (!remarks.trim()) {
       setError("Remarks are mandatory before making a decision");
+      // Scroll to and focus the remarks textarea
+      textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 300);
       return;
     }
     setError("");
@@ -128,6 +134,7 @@ const DecisionSection = ({ decision, onDecision, isReadOnly = false }: DecisionS
               Remarks <span className="text-destructive">*</span>
             </label>
             <Textarea
+              ref={textareaRef}
               placeholder="Enter your remarks here (mandatory for approval/rejection)..."
               value={remarks}
               onChange={(e) => {
