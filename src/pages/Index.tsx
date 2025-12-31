@@ -3,84 +3,80 @@ import { useSearchParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { ShieldX } from "lucide-react";
 import Header from "@/components/Header";
-import EmployeeProfile from "@/components/EmployeeProfile";
-import LoanDetails from "@/components/LoanDetails";
-import ReviewSection from "@/components/ReviewSection";
+import EmployeeProfile, { EmployeeData } from "@/components/EmployeeProfile";
+import LoanDetails, { LoanData } from "@/components/LoanDetails";
+import ReviewSection, { ReviewData } from "@/components/ReviewSection";
 import DecisionSection from "@/components/DecisionSection";
 import mLine from "@/assets/m-line.png";
 import employeeAvatar from "@/assets/employee-avatar.jpg";
 
-// Demo data
-const employeeData = {
-  photo: employeeAvatar,
-  name: "Mohammad Rafiqul Islam",
-  employeeId: "MTB-2019-0847",
-  designation: "Senior Manager",
-  department: "Corporate Banking",
-  division: "Commercial Division",
-  joiningDate: "15 March, 2019",
-  employmentStatus: "Permanent" as const,
-  mobile: "+880 1711-234567",
-  applyDate: "25 Dec, 2024",
+// Demo data matching API response structure
+const employeeData: EmployeeData = {
+  Photo: employeeAvatar,
+  fullName: "Md. Mahmudul Haque Khan",
+  applicationId: "2025000004",
+  employeeId: "C4148",
+  designation: "Junior Asst Vice President",
+  department: "MTB Digital Banking Division",
+  divisionHead: "Khalid Hossin",
+  joiningDate: "11/3/2025 12:00:00 AM",
+  employeeType: "Regular",
+  mobileNumber: "01855333129",
+  applicationDate: "12/23/2025 12:00:00 AM",
 };
 
-const loanData = {
-  amount: 5000000,
-  tenorMonths: 180,
-  emiAmount: 48500,
-  interestRate: 9.5,
-  purpose: "Construction of residential house on owned land at Uttara, Dhaka. Plot size 4 katha, proposed construction 2,500 sq ft.",
-  dbr: 42,
-  existingExposure: [
-    { type: "Car Loan", amount: 1500000, outstanding: 850000 },
-    { type: "Credit Card", amount: 300000, outstanding: 45000 },
-  ],
+const loanData: LoanData = {
+  loanAmount: "6870000",
+  interestRate: "4.5",
+  loanTenure: "131",
+  monthlyEmi: "66471",
+  dbr: "",
+  buildingConstruction: "1",
+  flatExtensionRenovation: "1",
+  landBuildingConstruction: "1",
+  readymadeFlat: "1",
 };
 
-const reviewData = [
+const reviewData: ReviewData[] = [
   {
     title: "Line Manager Review",
-    department: "Reporting Authority",
-    status: "approved" as const,
-    reviewer: "Mr. Anis Rahman",
-    date: "27 Dec, 2024",
-    remarks: "Employee performance is satisfactory. Recommended for loan approval based on service record and conduct.",
+    subTitle: "Reporting Authority",
+    byName: "Khalid Hossin",
+    status: "Approved",
+    byDate: "12/30/2025 12:00:00 AM",
+    byRemark: "Employee performance is satisfactory. Recommended for loan approval based on service record and conduct.",
   },
   {
     title: "CIB Review",
-    department: "Credit Information Bureau",
-    status: "approved" as const,
-    reviewer: "Mr. Nasir Uddin",
-    date: "27 Dec, 2024",
-    remarks: "CIB report verified. No overdue or classified loans found. Credit history is satisfactory.",
-    cibStatus: "Clear",
-    cibDate: "27 Dec, 2024",
+    subTitle: "Credit Information Bureau",
+    byName: "Md. Jahidur Rahman",
+    status: "Pending",
+    byDate: "12/28/2025 12:00:00 AM",
+    byRemark: "CIB report verified. No overdue or classified loans found. Credit history is satisfactory.",
   },
   {
     title: "CAD Review",
-    department: "Credit Administration",
-    status: "pending" as const,
-    remarks: "Awaiting final valuation report from approved surveyor.",
+    subTitle: "Credit Administration",
+    byName: "AVIJIT SARKAR",
+    status: "Approved",
+    byDate: "12/28/2025 12:00:00 AM",
+    byRemark: "Awaiting final valuation report from approved surveyor.",
   },
   {
     title: "Legal Review",
-    department: "Legal & Compliance",
-    status: "approved" as const,
-    reviewer: "Mr. Kamal Hossain",
-    date: "29 Dec, 2024",
-    remarks: "Property documents verified. Title deed is clear. No encumbrance found. Mutation records are in order.",
-    attachments: [
-      { name: "Title_Deed.pdf", url: "#" },
-      { name: "Mutation_Certificate.pdf", url: "#" },
-    ],
+    subTitle: "Legal and Compliance",
+    byName: "Aynul Haque",
+    status: "Approved",
+    byDate: "12/28/2025 12:00:00 AM",
+    byRemark: "Property documents verified. Title deed is clear. No encumbrance found. Mutation records are in order.",
   },
   {
-    title: "HR Verification",
-    department: "Human Resources",
-    status: "approved" as const,
-    reviewer: "Ms. Fatima Begum",
-    date: "28 Dec, 2024",
-    remarks: "Employee service record verified. No disciplinary action on file. Salary and benefits confirmed as per records.",
+    title: "HR Review",
+    subTitle: "Human Resources",
+    byName: "Md. Hakimur Rahman",
+    status: "Approved",
+    byDate: "12/30/2025 12:00:00 AM",
+    byRemark: "Employee service record verified. No disciplinary action on file. Salary and benefits confirmed as per records.",
   },
 ];
 
