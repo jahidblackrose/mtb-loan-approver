@@ -9,10 +9,10 @@ interface EmployeeData {
   designation: string;
   department: string;
   division: string;
-  divisionHead: string;
   joiningDate: string;
   employmentStatus: "Permanent" | "Contractual" | "Probation";
   mobile?: string;
+  applyDate?: string;
 }
 
 interface EmployeeProfileProps {
@@ -79,11 +79,6 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                 value={employee.division}
               />
               <InfoItem 
-                icon={<User className="w-4 h-4" />}
-                label="Division Head"
-                value={employee.divisionHead}
-              />
-              <InfoItem 
                 icon={<Calendar className="w-4 h-4" />}
                 label="Joining Date"
                 value={employee.joiningDate}
@@ -93,6 +88,13 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                   icon={<Phone className="w-4 h-4" />}
                   label="Mobile"
                   value={employee.mobile}
+                />
+              )}
+              {employee.applyDate && (
+                <InfoItem 
+                  icon={<Calendar className="w-4 h-4" />}
+                  label="Apply Date"
+                  value={employee.applyDate}
                 />
               )}
             </div>

@@ -18,10 +18,10 @@ const employeeData = {
   designation: "Senior Manager",
   department: "Corporate Banking",
   division: "Commercial Division",
-  divisionHead: "Mr. Anis Rahman",
   joiningDate: "15 March, 2019",
   employmentStatus: "Permanent" as const,
   mobile: "+880 1711-234567",
+  applyDate: "25 Dec, 2024",
 };
 
 const loanData = {
@@ -47,12 +47,20 @@ const reviewData = [
     remarks: "Employee performance is satisfactory. Recommended for loan approval based on service record and conduct.",
   },
   {
-    title: "HR Verification",
-    department: "Human Resources",
+    title: "CIB Review",
+    department: "Credit Information Bureau",
     status: "approved" as const,
-    reviewer: "Ms. Fatima Begum",
-    date: "28 Dec, 2024",
-    remarks: "Employee service record verified. No disciplinary action on file. Salary and benefits confirmed as per records.",
+    reviewer: "Mr. Nasir Uddin",
+    date: "27 Dec, 2024",
+    remarks: "CIB report verified. No overdue or classified loans found. Credit history is satisfactory.",
+    cibStatus: "Clear",
+    cibDate: "27 Dec, 2024",
+  },
+  {
+    title: "CAD Review",
+    department: "Credit Administration",
+    status: "pending" as const,
+    remarks: "Awaiting final valuation report from approved surveyor.",
   },
   {
     title: "Legal Review",
@@ -67,20 +75,12 @@ const reviewData = [
     ],
   },
   {
-    title: "CAD Review",
-    department: "Credit Administration",
-    status: "pending" as const,
-    remarks: "Awaiting final valuation report from approved surveyor.",
-  },
-  {
-    title: "CIB Review",
-    department: "Credit Information Bureau",
+    title: "HR Verification",
+    department: "Human Resources",
     status: "approved" as const,
-    reviewer: "Mr. Nasir Uddin",
-    date: "27 Dec, 2024",
-    remarks: "CIB report verified. No overdue or classified loans found. Credit history is satisfactory.",
-    cibStatus: "Clear",
-    cibDate: "27 Dec, 2024",
+    reviewer: "Ms. Fatima Begum",
+    date: "28 Dec, 2024",
+    remarks: "Employee service record verified. No disciplinary action on file. Salary and benefits confirmed as per records.",
   },
 ];
 
