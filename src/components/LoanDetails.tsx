@@ -55,7 +55,8 @@ const LoanDetails = ({ loan }: LoanDetailsProps) => {
           <LoanMetric
             icon={<Banknote className="w-4 h-4" />}
             label="Loan Amount"
-            value={formatCurrency(loan.amount)}
+            value="BDT"
+            subValue={new Intl.NumberFormat('en-BD').format(loan.amount)}
             highlight
           />
           <LoanMetric
@@ -119,33 +120,6 @@ const LoanDetails = ({ loan }: LoanDetailsProps) => {
           </div>
         </div>
 
-        {/* Existing Exposure */}
-        {loan.existingExposure && loan.existingExposure.length > 0 && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-foreground">Existing Loan Exposure</h4>
-            <div className="space-y-2">
-              {loan.existingExposure.map((exposure, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{exposure.type}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Limit: {formatCurrency(exposure.amount)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-foreground">
-                      {formatCurrency(exposure.outstanding)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Outstanding</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

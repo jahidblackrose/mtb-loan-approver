@@ -1,4 +1,4 @@
-import { User, Building2, Calendar, Briefcase, Users } from "lucide-react";
+import { User, Building2, Calendar, Briefcase, Users, Phone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,6 +12,7 @@ interface EmployeeData {
   divisionHead: string;
   joiningDate: string;
   employmentStatus: "Permanent" | "Contractual" | "Probation";
+  mobile?: string;
 }
 
 interface EmployeeProfileProps {
@@ -87,6 +88,13 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                 label="Joining Date"
                 value={employee.joiningDate}
               />
+              {employee.mobile && (
+                <InfoItem 
+                  icon={<Phone className="w-4 h-4" />}
+                  label="Mobile"
+                  value={employee.mobile}
+                />
+              )}
             </div>
           </div>
         </div>

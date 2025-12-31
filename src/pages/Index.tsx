@@ -21,6 +21,7 @@ const employeeData = {
   divisionHead: "Mr. Anis Rahman",
   joiningDate: "15 March, 2019",
   employmentStatus: "Permanent" as const,
+  mobile: "+880 1711-234567",
 };
 
 const loanData = {
@@ -37,6 +38,14 @@ const loanData = {
 };
 
 const reviewData = [
+  {
+    title: "Line Manager Review",
+    department: "Reporting Authority",
+    status: "approved" as const,
+    reviewer: "Mr. Anis Rahman",
+    date: "27 Dec, 2024",
+    remarks: "Employee performance is satisfactory. Recommended for loan approval based on service record and conduct.",
+  },
   {
     title: "HR Verification",
     department: "Human Resources",
