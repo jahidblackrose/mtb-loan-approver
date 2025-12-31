@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-interface ReviewData {
+export interface ReviewData {
   title: string;
-  department: string;
-  status: "approved" | "pending" | "rejected";
-  reviewer?: string;
-  date?: string;
-  remarks?: string;
+  subTitle: string;
+  byName?: string;
+  status: string;
+  byDate?: string;
+  byRemark?: string;
   attachments?: { name: string; url: string }[];
   cibStatus?: string;
   cibDate?: string;
@@ -43,31 +43,46 @@ const ReviewSection = ({ reviews }: ReviewSectionProps) => {
 const ReviewCard = ({ review }: { review: ReviewData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const statusConfig = {
-    approved: {
-      icon: <CheckCircle2 className="w-4 h-4" />,
-      color: "text-success",
-      bg: "bg-success/10",
-      border: "border-success/20",
-      label: "Approved",
-    },
-    pending: {
+  const getStatusConfig = (status: string) => {
+    const normalizedStatus = status?.toLowerCase();
+    if (normalizedStatus === "approved") {
+      return {
+        icon: <CheckCircle2 className="w-4 h-4" />,
+        color: "text-success",
+        bg: "bg-success/10",
+        border: "border-success/20",
+        label: "Approved",
+      };
+    }
+    if (normalizedStatus === "rejected") {
+      return {
+        icon: <XCircle className="w-4 h-4" />,
+        color: "text-destructive",
+        bg: "bg-destructive/10",
+        border: "border-destructive/20",
+        label: "Rejected",
+      };
+    }
+    return {
       icon: <Clock className="w-4 h-4" />,
       color: "text-warning",
       bg: "bg-warning/10",
       border: "border-warning/20",
       label: "Pending",
-    },
-    rejected: {
-      icon: <XCircle className="w-4 h-4" />,
-      color: "text-destructive",
-      bg: "bg-destructive/10",
-      border: "border-destructive/20",
-      label: "Rejected",
-    },
+    };
   };
 
-  const config = statusConfig[review.status];
+  const config = getStatusConfig(review.status);
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "";
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  };
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -80,7 +95,7 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
               </div>
               <div className="text-left">
                 <h4 className="text-sm font-semibold text-foreground">{review.title}</h4>
-                <p className="text-xs text-muted-foreground">{review.department}</p>
+                <p className="text-xs text-muted-foreground">{review.subTitle}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -96,13 +111,13 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
         
         <CollapsibleContent>
           <div className="px-4 pb-4 pt-2 border-t border-border/50 space-y-3">
-            {review.reviewer && (
+            {review.byName && (
               <div className="flex items-center gap-2 text-sm">
                 <User className="w-4 h-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Reviewed by:</span>
-                <span className="font-medium text-foreground">{review.reviewer}</span>
-                {review.date && (
-                  <span className="text-xs text-muted-foreground">• {review.date}</span>
+                <span className="font-medium text-foreground">{review.byName}</span>
+                {review.byDate && (
+                  <span className="text-xs text-muted-foreground">• {formatDate(review.byDate)}</span>
                 )}
               </div>
             )}
@@ -118,16 +133,16 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
                 {review.cibDate && (
                   <div className="p-3 rounded-md bg-card border border-border">
                     <p className="text-xs text-muted-foreground mb-1">CIB Date</p>
-                    <p className="text-sm font-medium text-foreground">{review.cibDate}</p>
+                    <p className="text-sm font-medium text-foreground">{formatDate(review.cibDate)}</p>
                   </div>
                 )}
               </div>
             )}
 
-            {review.remarks && (
+            {review.byRemark && (
               <div className="p-3 rounded-md bg-card border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Remarks</p>
-                <p className="text-sm text-foreground">{review.remarks}</p>
+                <p className="text-sm text-foreground">{review.byRemark}</p>
               </div>
             )}
 

@@ -2,17 +2,18 @@ import { User, Building2, Calendar, Briefcase, Users, Phone } from "lucide-react
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-interface EmployeeData {
-  photo?: string;
-  name: string;
+export interface EmployeeData {
+  Photo?: string;
+  fullName: string;
+  applicationId: string;
   employeeId: string;
   designation: string;
   department: string;
-  division: string;
+  divisionHead?: string;
   joiningDate: string;
-  employmentStatus: "Permanent" | "Contractual" | "Probation";
-  mobile?: string;
-  applyDate?: string;
+  employeeType: string;
+  mobileNumber?: string;
+  applicationDate?: string;
 }
 
 interface EmployeeProfileProps {
@@ -20,10 +21,25 @@ interface EmployeeProfileProps {
 }
 
 const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
-  const statusColors = {
-    Permanent: "bg-success/10 text-success border-success/20",
-    Contractual: "bg-warning/10 text-warning border-warning/20",
-    Probation: "bg-primary/10 text-primary border-primary/20",
+  const getStatusColors = (status: string) => {
+    const normalizedStatus = status?.toLowerCase();
+    if (normalizedStatus === "regular" || normalizedStatus === "permanent") {
+      return "bg-success/10 text-success border-success/20";
+    }
+    if (normalizedStatus === "contractual") {
+      return "bg-warning/10 text-warning border-warning/20";
+    }
+    return "bg-primary/10 text-primary border-primary/20";
+  };
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "";
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
   };
 
   return (
@@ -36,10 +52,10 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
             <div className="relative">
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
                 <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden">
-                  {employee.photo ? (
+                  {employee.Photo ? (
                     <img 
-                      src={employee.photo} 
-                      alt={employee.name}
+                      src={employee.Photo.startsWith('data:') ? employee.Photo : `data:image/jpeg;base64,${employee.Photo}`} 
+                      alt={employee.fullName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -48,9 +64,9 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                 </div>
               </div>
               <Badge 
-                className={`absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 ${statusColors[employee.employmentStatus]}`}
+                className={`absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 ${getStatusColors(employee.employeeType)}`}
               >
-                {employee.employmentStatus}
+                {employee.employeeType}
               </Badge>
             </div>
           </div>
@@ -58,7 +74,7 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
           {/* Employee Info */}
           <div className="flex-1 space-y-4">
             <div className="text-center sm:text-left">
-              <h2 className="text-xl font-bold text-foreground">{employee.name}</h2>
+              <h2 className="text-xl font-bold text-foreground">{employee.fullName}</h2>
               <p className="text-sm text-muted-foreground">ID: {employee.employeeId}</p>
             </div>
 
@@ -73,28 +89,30 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                 label="Department"
                 value={employee.department}
               />
-              <InfoItem 
-                icon={<Users className="w-4 h-4" />}
-                label="Division"
-                value={employee.division}
-              />
+              {employee.divisionHead && (
+                <InfoItem 
+                  icon={<Users className="w-4 h-4" />}
+                  label="Division Head"
+                  value={employee.divisionHead}
+                />
+              )}
               <InfoItem 
                 icon={<Calendar className="w-4 h-4" />}
                 label="Joining Date"
-                value={employee.joiningDate}
+                value={formatDate(employee.joiningDate)}
               />
-              {employee.mobile && (
+              {employee.mobileNumber && (
                 <InfoItem 
                   icon={<Phone className="w-4 h-4" />}
                   label="Mobile"
-                  value={employee.mobile}
+                  value={employee.mobileNumber}
                 />
               )}
-              {employee.applyDate && (
+              {employee.applicationDate && (
                 <InfoItem 
                   icon={<Calendar className="w-4 h-4" />}
                   label="Apply Date"
-                  value={employee.applyDate}
+                  value={formatDate(employee.applicationDate)}
                 />
               )}
             </div>
