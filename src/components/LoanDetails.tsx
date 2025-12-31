@@ -55,8 +55,8 @@ const LoanDetails = ({ loan }: LoanDetailsProps) => {
           <LoanMetric
             icon={<Banknote className="w-4 h-4" />}
             label="Loan Amount"
-            value="BDT"
-            subValue={new Intl.NumberFormat('en-BD').format(loan.amount)}
+            value={new Intl.NumberFormat('en-BD').format(loan.amount)}
+            subValue="BDT"
             highlight
           />
           <LoanMetric
