@@ -5,15 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export interface ReviewData {
-  title: string;
-  subTitle: string;
-  byName?: string;
-  status: string;
-  byDate?: string;
-  byRemark?: string;
-  attachments?: { name: string; url: string }[];
-  cibStatus?: string;
-  cibDate?: string;
+  Title: string;
+  SubTitle: string;
+  ByName?: string;
+  Status: string;
+  ByDate?: string;
+  ByRemark?: string;
 }
 
 interface ReviewSectionProps {
@@ -72,7 +69,7 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
     };
   };
 
-  const config = getStatusConfig(review.status);
+  const config = getStatusConfig(review.Status);
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "";
@@ -94,8 +91,8 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
                 {config.icon}
               </div>
               <div className="text-left">
-                <h4 className="text-sm font-semibold text-foreground">{review.title}</h4>
-                <p className="text-xs text-muted-foreground">{review.subTitle}</p>
+                <h4 className="text-sm font-semibold text-foreground">{review.Title}</h4>
+                <p className="text-xs text-muted-foreground">{review.SubTitle}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -111,56 +108,21 @@ const ReviewCard = ({ review }: { review: ReviewData }) => {
         
         <CollapsibleContent>
           <div className="px-4 pb-4 pt-2 border-t border-border/50 space-y-3">
-            {review.byName && (
+            {review.ByName && (
               <div className="flex items-center gap-2 text-sm">
                 <User className="w-4 h-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Reviewed by:</span>
-                <span className="font-medium text-foreground">{review.byName}</span>
-                {review.byDate && (
-                  <span className="text-xs text-muted-foreground">• {formatDate(review.byDate)}</span>
-                )}
-              </div>
-            )}
-            
-            {(review.cibStatus || review.cibDate) && (
-              <div className="grid grid-cols-2 gap-3 mb-2">
-                {review.cibStatus && (
-                  <div className="p-3 rounded-md bg-card border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">CIB Status</p>
-                    <p className="text-sm font-medium text-foreground">{review.cibStatus}</p>
-                  </div>
-                )}
-                {review.cibDate && (
-                  <div className="p-3 rounded-md bg-card border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">CIB Date</p>
-                    <p className="text-sm font-medium text-foreground">{formatDate(review.cibDate)}</p>
-                  </div>
+                <span className="font-medium text-foreground">{review.ByName}</span>
+                {review.ByDate && (
+                  <span className="text-xs text-muted-foreground">• {formatDate(review.ByDate)}</span>
                 )}
               </div>
             )}
 
-            {review.byRemark && (
+            {review.ByRemark && (
               <div className="p-3 rounded-md bg-card border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Remarks</p>
-                <p className="text-sm text-foreground">{review.byRemark}</p>
-              </div>
-            )}
-
-            {review.attachments && review.attachments.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">Attachments</p>
-                <div className="flex flex-wrap gap-2">
-                  {review.attachments.map((attachment, idx) => (
-                    <a
-                      key={idx}
-                      href={attachment.url}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent text-accent-foreground text-xs font-medium hover:bg-accent/80 transition-colors"
-                    >
-                      <FileText className="w-3 h-3" />
-                      {attachment.name}
-                    </a>
-                  ))}
-                </div>
+                <p className="text-sm text-foreground">{review.ByRemark}</p>
               </div>
             )}
           </div>

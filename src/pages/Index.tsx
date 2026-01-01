@@ -1,88 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { ShieldX } from "lucide-react";
+import { ShieldX, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import EmployeeProfile, { EmployeeData } from "@/components/EmployeeProfile";
 import LoanDetails, { LoanData } from "@/components/LoanDetails";
 import ReviewSection, { ReviewData } from "@/components/ReviewSection";
 import DecisionSection from "@/components/DecisionSection";
 import mLine from "@/assets/m-line.png";
-import employeeAvatar from "@/assets/employee-avatar.jpg";
+import { 
+  fetchAllData, 
+  generateOtp, 
+  resendOtp, 
+  validateOtp,
+  EmployeeApiData,
+  ReviewApiData 
+} from "@/services/apiService";
 
-// Demo data matching API response structure
-const employeeData: EmployeeData = {
-  Photo: employeeAvatar,
-  fullName: "Md. Mahmudul Haque Khan",
-  applicationId: "2025000004",
-  employeeId: "C4148",
-  designation: "Junior Asst Vice President",
-  department: "MTB Digital Banking Division",
-  divisionHead: "Khalid Hossin",
-  joiningDate: "11/3/2025 12:00:00 AM",
-  employeeType: "Regular",
-  mobileNumber: "01855333129",
-  applicationDate: "12/23/2025 12:00:00 AM",
-};
+// Transform API response to component format
+const transformEmployeeData = (apiData: EmployeeApiData): EmployeeData => ({
+  Photo: apiData.Photo,
+  FullName: apiData.FullName,
+  ApplicationId: apiData.ApplicationId,
+  EmployeeId: apiData.EmployeeId,
+  Designation: apiData.Designation,
+  Department: apiData.Department,
+  JoiningDate: apiData.JoiningDate,
+  EmployeeType: apiData.EmployeeType,
+  MobileNumber: apiData.MobileNumber,
+  ApplicationDate: apiData.ApplicationDate,
+});
 
-const loanData: LoanData = {
-  loanAmount: "6870000",
-  interestRate: "4.5",
-  loanTenure: "131",
-  monthlyEmi: "66471",
-  dbr: "",
-  buildingConstruction: "1",
-  flatExtensionRenovation: "1",
-  landBuildingConstruction: "1",
-  readymadeFlat: "1",
-};
+const transformLoanData = (apiData: EmployeeApiData): LoanData => ({
+  LoanAmount: apiData.LoanAmount,
+  LoanTenure: apiData.LoanTenure,
+  MonthlyEmi: apiData.MonthlyEmi,
+  InterestRate: apiData.InterestRate,
+  Dbr: apiData.Dbr,
+  BuildingConstruction: apiData.BuildingConstruction,
+  FlatExtensionRenovation: apiData.FlatExtensionRenovation,
+  LandBuildingConstruction: apiData.LandBuildingConstruction,
+  ReadymadeFlat: apiData.ReadymadeFlat,
+});
 
-const reviewData: ReviewData[] = [
-  {
-    title: "Line Manager Review",
-    subTitle: "Reporting Authority",
-    byName: "Khalid Hossin",
-    status: "Approved",
-    byDate: "12/30/2025 12:00:00 AM",
-    byRemark: "Employee performance is satisfactory. Recommended for loan approval based on service record and conduct.",
-  },
-  {
-    title: "CIB Review",
-    subTitle: "Credit Information Bureau",
-    byName: "Md. Jahidur Rahman",
-    status: "Pending",
-    byDate: "12/28/2025 12:00:00 AM",
-    byRemark: "CIB report verified. No overdue or classified loans found. Credit history is satisfactory.",
-  },
-  {
-    title: "CAD Review",
-    subTitle: "Credit Administration",
-    byName: "AVIJIT SARKAR",
-    status: "Approved",
-    byDate: "12/28/2025 12:00:00 AM",
-    byRemark: "Awaiting final valuation report from approved surveyor.",
-  },
-  {
-    title: "Legal Review",
-    subTitle: "Legal and Compliance",
-    byName: "Aynul Haque",
-    status: "Approved",
-    byDate: "12/28/2025 12:00:00 AM",
-    byRemark: "Property documents verified. Title deed is clear. No encumbrance found. Mutation records are in order.",
-  },
-  {
-    title: "HR Review",
-    subTitle: "Human Resources",
-    byName: "Md. Hakimur Rahman",
-    status: "Approved",
-    byDate: "12/30/2025 12:00:00 AM",
-    byRemark: "Employee service record verified. No disciplinary action on file. Salary and benefits confirmed as per records.",
-  },
-];
+const transformReviewData = (apiData: ReviewApiData[]): ReviewData[] =>
+  apiData.map((review) => ({
+    Title: review.Title,
+    SubTitle: review.SubTitle,
+    ByName: review.ByName,
+    Status: review.Status,
+    ByDate: review.ByDate,
+    ByRemark: review.ByRemark,
+  }));
 
 const Index = () => {
   const [searchParams] = useSearchParams();
   const applicationId = searchParams.get("ID");
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
+  const [loanData, setLoanData] = useState<LoanData | null>(null);
+  const [reviewData, setReviewData] = useState<ReviewData[]>([]);
+  const [accessUserId, setAccessUserId] = useState<string>("");
 
   const [decision, setDecision] = useState<{
     status?: "approved" | "rejected" | "pending";
@@ -90,6 +70,85 @@ const Index = () => {
     decidedAt?: string;
     remarks?: string;
   }>({ status: "pending" });
+
+  // Fetch data on mount
+  useEffect(() => {
+    if (!applicationId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetchAllData(applicationId);
+        
+        if (response.Status === "200" && response.EmployeeDataList.length > 0) {
+          const empData = response.EmployeeDataList[0];
+          setEmployeeData(transformEmployeeData(empData));
+          setLoanData(transformLoanData(empData));
+          setReviewData(transformReviewData(response.ReviewDataList));
+          setAccessUserId(empData.accessuserid);
+        } else {
+          setError(response.Message || "Failed to load application data");
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load application data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [applicationId]);
+
+  const handleGenerateOtp = async (action: "A" | "R", remarks: string) => {
+    if (!applicationId) return { success: false, message: "Invalid application ID" };
+    
+    try {
+      const response = await generateOtp(applicationId, accessUserId, action, remarks);
+      return {
+        success: response.Status === "200",
+        message: response.Message,
+      };
+    } catch (err) {
+      console.error("Error generating OTP:", err);
+      return { success: false, message: "Failed to generate OTP" };
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!applicationId) return { success: false, message: "Invalid application ID" };
+    
+    try {
+      const response = await resendOtp(applicationId, accessUserId);
+      return {
+        success: response.Status === "200",
+        message: response.Message,
+      };
+    } catch (err) {
+      console.error("Error resending OTP:", err);
+      return { success: false, message: "Failed to resend OTP" };
+    }
+  };
+
+  const handleValidateOtp = async (otp: string) => {
+    if (!applicationId) return { success: false, message: "Invalid application ID" };
+    
+    try {
+      const response = await validateOtp(applicationId, accessUserId, otp);
+      return {
+        success: response.Status === "200",
+        message: response.Message,
+      };
+    } catch (err) {
+      console.error("Error validating OTP:", err);
+      return { success: false, message: "Failed to validate OTP" };
+    }
+  };
 
   const handleDecision = (status: "approved" | "rejected", remarks: string) => {
     const now = new Date();
@@ -103,7 +162,7 @@ const Index = () => {
 
     setDecision({
       status,
-      decidedBy: "Mr. Shahid Mahmud (AGM)",
+      decidedBy: employeeData?.FullName || "User",
       decidedAt: formattedDate,
       remarks,
     });
@@ -126,6 +185,35 @@ const Index = () => {
           <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
           <p className="text-muted-foreground">
             Invalid or missing application reference. Please use a valid link to access the loan application.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Loading application data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !employeeData || !loanData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="mx-auto w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center">
+            <ShieldX className="w-10 h-10 text-destructive" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Error</h1>
+          <p className="text-muted-foreground">
+            {error || "Failed to load application data"}
           </p>
         </div>
       </div>
@@ -174,6 +262,9 @@ const Index = () => {
         <DecisionSection 
           decision={decision}
           onDecision={handleDecision}
+          onGenerateOtp={handleGenerateOtp}
+          onResendOtp={handleResendOtp}
+          onValidateOtp={handleValidateOtp}
           isReadOnly={decision.status !== "pending"}
         />
       </main>

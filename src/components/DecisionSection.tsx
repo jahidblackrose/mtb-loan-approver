@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { CheckCircle2, XCircle, Shield, Clock, User } from "lucide-react";
+import { CheckCircle2, XCircle, Shield, Clock, User, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,29 +16,57 @@ interface DecisionData {
 interface DecisionSectionProps {
   decision?: DecisionData;
   onDecision: (decision: "approved" | "rejected", remarks: string) => void;
+  onGenerateOtp: (action: "A" | "R", remarks: string) => Promise<{ success: boolean; message: string }>;
+  onResendOtp: () => Promise<{ success: boolean; message: string }>;
+  onValidateOtp: (otp: string) => Promise<{ success: boolean; message: string }>;
   isReadOnly?: boolean;
 }
 
-const DecisionSection = ({ decision, onDecision, isReadOnly = false }: DecisionSectionProps) => {
+const DecisionSection = ({ 
+  decision, 
+  onDecision, 
+  onGenerateOtp,
+  onResendOtp,
+  onValidateOtp,
+  isReadOnly = false 
+}: DecisionSectionProps) => {
   const [remarks, setRemarks] = useState("");
   const [selectedAction, setSelectedAction] = useState<"approved" | "rejected" | null>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpMessage, setOtpMessage] = useState("");
+  const [isGeneratingOtp, setIsGeneratingOtp] = useState(false);
   const [error, setError] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleActionClick = (action: "approved" | "rejected") => {
+  const handleActionClick = async (action: "approved" | "rejected") => {
     if (!remarks.trim()) {
       setError("Remarks are mandatory before making a decision");
-      // Scroll to and focus the remarks textarea
       textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       setTimeout(() => {
         textareaRef.current?.focus();
       }, 300);
       return;
     }
+    
     setError("");
     setSelectedAction(action);
-    setShowOtpModal(true);
+    setIsGeneratingOtp(true);
+
+    try {
+      const apiAction = action === "approved" ? "A" : "R";
+      const result = await onGenerateOtp(apiAction, remarks);
+      
+      if (result.success) {
+        setOtpMessage(result.message);
+        setShowOtpModal(true);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError("Failed to generate OTP. Please try again.");
+    } finally {
+      setIsGeneratingOtp(false);
+    }
   };
 
   const handleOtpVerified = () => {
@@ -142,7 +170,7 @@ const DecisionSection = ({ decision, onDecision, isReadOnly = false }: DecisionS
                 if (error) setError("");
               }}
               className="min-h-[100px] resize-none"
-              disabled={isReadOnly}
+              disabled={isReadOnly || isGeneratingOtp}
             />
             {error && (
               <p className="text-sm text-destructive mt-2">{error}</p>
@@ -166,20 +194,38 @@ const DecisionSection = ({ decision, onDecision, isReadOnly = false }: DecisionS
             size="lg"
             className="flex-1"
             onClick={() => handleActionClick("rejected")}
-            disabled={isReadOnly}
+            disabled={isReadOnly || isGeneratingOtp}
           >
-            <XCircle className="w-5 h-5" />
-            Reject
+            {isGeneratingOtp && selectedAction === "rejected" ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating OTP...
+              </>
+            ) : (
+              <>
+                <XCircle className="w-5 h-5" />
+                Reject
+              </>
+            )}
           </Button>
           <Button
             variant="success"
             size="lg"
             className="flex-1"
             onClick={() => handleActionClick("approved")}
-            disabled={isReadOnly}
+            disabled={isReadOnly || isGeneratingOtp}
           >
-            <CheckCircle2 className="w-5 h-5" />
-            Approve
+            {isGeneratingOtp && selectedAction === "approved" ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating OTP...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-5 h-5" />
+                Approve
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -191,7 +237,10 @@ const DecisionSection = ({ decision, onDecision, isReadOnly = false }: DecisionS
           setSelectedAction(null);
         }}
         onVerified={handleOtpVerified}
+        onResendOtp={onResendOtp}
+        onValidateOtp={onValidateOtp}
         action={selectedAction || "approved"}
+        otpMessage={otpMessage}
       />
     </>
   );
