@@ -1,19 +1,18 @@
-import { User, Building2, Calendar, Briefcase, Users, Phone } from "lucide-react";
+import { User, Building2, Calendar, Phone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export interface EmployeeData {
   Photo?: string;
-  fullName: string;
-  applicationId: string;
-  employeeId: string;
-  designation: string;
-  department: string;
-  divisionHead?: string;
-  joiningDate: string;
-  employeeType: string;
-  mobileNumber?: string;
-  applicationDate?: string;
+  FullName: string;
+  ApplicationId: string;
+  EmployeeId: string;
+  Designation: string;
+  Department: string;
+  JoiningDate: string;
+  EmployeeType: string;
+  MobileNumber?: string;
+  ApplicationDate?: string;
 }
 
 interface EmployeeProfileProps {
@@ -42,6 +41,13 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
     }
   };
 
+  const truncateDesignation = (designation: string) => {
+    if (designation.length > 20) {
+      return designation.substring(0, 18) + "..";
+    }
+    return designation;
+  };
+
   return (
     <Card className="overflow-hidden animate-slide-up shadow-card hover:shadow-card-hover transition-shadow duration-300">
       <div className="h-2 bg-gradient-to-r from-primary via-pink-500 to-secondary" />
@@ -55,7 +61,7 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                   {employee.Photo ? (
                     <img 
                       src={employee.Photo.startsWith('data:') ? employee.Photo : `data:image/jpeg;base64,${employee.Photo}`} 
-                      alt={employee.fullName}
+                      alt={employee.FullName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -64,9 +70,9 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
                 </div>
               </div>
               <Badge 
-                className={`absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 ${getStatusColors(employee.employeeType)}`}
+                className={`absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 ${getStatusColors(employee.EmployeeType)}`}
               >
-                {employee.employeeType}
+                {employee.EmployeeType}
               </Badge>
             </div>
           </div>
@@ -74,45 +80,36 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
           {/* Employee Info */}
           <div className="flex-1 space-y-4">
             <div className="text-center sm:text-left">
-              <h2 className="text-xl font-bold text-foreground">{employee.fullName}</h2>
-              <p className="text-sm text-muted-foreground">ID: {employee.employeeId}</p>
+              <h2 className="text-xl font-bold text-foreground">{employee.FullName}</h2>
+              <p className="text-sm text-muted-foreground">
+                ID: {employee.EmployeeId} ({truncateDesignation(employee.Designation)})
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <InfoItem 
-                icon={<Briefcase className="w-4 h-4" />}
-                label="Designation"
-                value={employee.designation}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InfoItem 
                 icon={<Building2 className="w-4 h-4" />}
-                label="Department"
-                value={employee.department}
+                label="Designation & Department"
+                value={`${employee.Designation} - ${employee.Department}`}
+                fullWidth
               />
-              {employee.divisionHead && (
-                <InfoItem 
-                  icon={<Users className="w-4 h-4" />}
-                  label="Division Head"
-                  value={employee.divisionHead}
-                />
-              )}
               <InfoItem 
                 icon={<Calendar className="w-4 h-4" />}
                 label="Joining Date"
-                value={formatDate(employee.joiningDate)}
+                value={formatDate(employee.JoiningDate)}
               />
-              {employee.mobileNumber && (
+              {employee.MobileNumber && (
                 <InfoItem 
                   icon={<Phone className="w-4 h-4" />}
                   label="Mobile"
-                  value={employee.mobileNumber}
+                  value={employee.MobileNumber}
                 />
               )}
-              {employee.applicationDate && (
+              {employee.ApplicationDate && (
                 <InfoItem 
                   icon={<Calendar className="w-4 h-4" />}
                   label="Apply Date"
-                  value={formatDate(employee.applicationDate)}
+                  value={formatDate(employee.ApplicationDate)}
                 />
               )}
             </div>
@@ -123,14 +120,24 @@ const EmployeeProfile = ({ employee }: EmployeeProfileProps) => {
   );
 };
 
-const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-  <div className="flex items-start gap-2">
-    <div className="p-1.5 rounded-md bg-accent text-accent-foreground">
+const InfoItem = ({ 
+  icon, 
+  label, 
+  value, 
+  fullWidth = false 
+}: { 
+  icon: React.ReactNode; 
+  label: string; 
+  value: string;
+  fullWidth?: boolean;
+}) => (
+  <div className={`flex items-start gap-2 ${fullWidth ? 'md:col-span-2' : ''}`}>
+    <div className="p-1.5 rounded-md bg-accent text-accent-foreground flex-shrink-0">
       {icon}
     </div>
-    <div className="min-w-0">
+    <div className="min-w-0 flex-1">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-sm font-medium text-foreground truncate">{value}</p>
+      <p className="text-sm font-medium text-foreground break-words">{value}</p>
     </div>
   </div>
 );
